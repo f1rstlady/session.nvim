@@ -10,8 +10,14 @@ function! s:SessionExists()
 endfunction
 
 function! s:LoadSession()
+  " If a session was already loaded, do nothing.
+  if get(s:, 'session_loaded', 0)
+    return
+  endif
+
   if s:SessionExists() && !get(s:, 'read_from_stdin', 0) && (argc() == 0)
     let s:save_session = 1
+    let s:session_loaded = 1
     execute 'source ' . escape(g:session_name, '%')
     echohl ModeMsg | echomsg 'Session loaded' | echohl Normal
   else
