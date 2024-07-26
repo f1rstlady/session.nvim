@@ -6,23 +6,30 @@ Automatically load the session contained in the current directory.
 
 The behaviour of this plugin is:
  1. If there is a session file (e.g. `Session.vim`) in the current directory, no
-    input from stdin and no file argument on the command line, the session is
-    loaded on start.
- 2. If currently in a session, either loaded on start or activated manually with
-    `:ToggleSession`, it is written to a session file on exit.
- 3. The command `:ToggleSession` toggles, whether the current session is saved
-    on exit.  Additionally, the session file will be removed or created if a
-    currently in a session or not respectively.
-
-The name of the session file may be configured via the `g:session_name`
-variable.  By default, it is named `Session.vim`.
+    input from stdin and no argument on the command line, the session is loaded
+    on start.
+ 2. If a session was loaded on start or you activated session autosaving with
+    `:ToggleSessionAutosave`, the session is saved on exit.
+ 3. The command `:ToggleSessionAutosave` toggles whether the current session is saved
+    on exit.  The session file will be deleted or created accordingly.
 
 ## Installation
 
-With packer:
+With [lazy.nvim](https://github.com/folke/lazy.nvim):
 ```lua
-use "f1rstlady/session"
+return {
+  "f1rstlady/session",
+  lazy = false,
+  opts = {},
+}
 ```
 
-Alternatively, clone this repository into a the `start/` directory of a package
-(see `:h packages`).
+## Configuration
+
+The plugin can be configured through the setup function:
+```lua
+-- default options
+require('session').setup {
+  filename = 'Session.vim',
+}
+```
