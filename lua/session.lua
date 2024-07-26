@@ -4,6 +4,12 @@ local M = {}
 ---@field filename string
 local config = {
   filename = 'Session.vim',
+  notifyWhen = {
+    autosaveDisabled = true,
+    autosaveEnabled = true,
+    conflictingSession = true,
+    sessionLoaded = true,
+  },
 }
 
 local argumentsWereGiven = vim.fn.argc(-1) ~= 0
@@ -34,8 +40,13 @@ function M.load()
   if not M.exists() then
     return false
   end
+
   vim.cmd.source(config.filename)
-  notify 'loaded'
+
+  if config.notifyWhen.sessionLoaded then
+    notify 'loaded'
+  end
+
   return true
 end
 
@@ -53,7 +64,9 @@ end
 function M.disableAutosave()
   autosaveEnabled = false
   M.delete()
-  notify 'deleted & autosave disabled'
+  if config.notifyWhen.autosaveDisabled then
+    notify 'deleted & autosave disabled'
+  end
 end
 
 -- Enables autosave.
@@ -67,14 +80,16 @@ function M.enableAutosave(opts)
     }, function(choice)
       if choice == 'yes' then
         M.enableAutosave { force = true }
-      else
+      elseif config.notifyWhen.conflictingSession then
         notify 'autosave was not enabled due to a conflicting session'
       end
     end)
   else
     autosaveEnabled = true
     M.save()
-    notify 'saved & autosave enabled'
+    if config.notifyWhen.autosaveEnabled then
+      notify 'saved & autosave enabled'
+    end
   end
 end
 
@@ -88,7 +103,7 @@ function M.toggleAutosave()
 end
 
 function M.setup(opts)
-  config = vim.tbl_extend('force', config, opts or {})
+  config = vim.tbl_deep_extend('force', config, opts or {})
 
   local augroup = vim.api.nvim_create_augroup('session', { clear = true })
 
