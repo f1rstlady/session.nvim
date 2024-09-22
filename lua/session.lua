@@ -41,7 +41,11 @@ function M.load()
     return false
   end
 
-  vim.cmd.source(config.filename)
+  local ok, msg = pcall(vim.cmd.source, config.filename)
+  if not ok then
+    msg = msg:match 'E%d*:.+' or msg
+    vim.notify(msg, vim.log.levels.ERROR)
+  end
 
   if config.notifyWhen.sessionLoaded then
     notify 'loaded'
@@ -57,7 +61,11 @@ end
 
 -- Saves the current session into the session file.
 function M.save()
-  vim.cmd.mksession { bang = true, config.filename }
+  local ok, msg = pcall(vim.cmd.mksession, { bang = true, config.filename })
+  if not ok then
+    msg = msg:match 'E%d*:.+' or msg
+    vim.notify(msg, vim.log.levels.ERROR)
+  end
 end
 
 -- Disables autosave.
